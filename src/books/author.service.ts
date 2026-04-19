@@ -19,4 +19,18 @@ export class AuthorService {
         return this.authorRepo.save(newAuthor)
       }
     
+      async updateAuthor(id: number, data) {
+
+  const author = await this.authorRepo.findOne({
+    where: { id }
+  });
+
+  if (!author) {
+    throw new Error('Author not found');
+  }
+
+  Object.assign(author, data);
+
+  return this.authorRepo.save(author);
+}
 }

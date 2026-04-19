@@ -11,11 +11,12 @@ export class BooksService {
 
   async getAllBooks() {
     try {
-      let tab = await this.bookRepo.find(
-        {
-            loadRelationIds : true
-        }
-      );
+      let tab = await this.bookRepo.find({
+  relations: {
+    author: true,
+    user: true
+  }
+});
       return { listeBooks: tab };
     } catch (err) {
       return { message: 'Problème avec TypeOrm' };
@@ -57,18 +58,24 @@ export class BooksService {
     }
   }
 
-  async updateBook(selectedId, uBook) {
-    let b = await this.bookRepo.preload({
-      id: selectedId,
-      //   title: uBook.title,
-      //   editor: uBook.editor,
-      //   year: uBook.year,
-      //   image: uBook.image,
-      ...uBook,
-    });
-    let response = await this.bookRepo.save(b);
-    return { message: 'Livre mise à jour', response };
+  async updateBook(selectedId: number, uBook) {
+  const existingBook = await this.bookRepo.findOneBy({
+    id: selectedId,
+  });
+
+  if (!existingBook) {
+    throw new NotFoundException(`Book ${selectedId} not found`);
   }
+
+  Object.assign(existingBook, uBook);
+
+  const response = await this.bookRepo.save(existingBook);
+
+  return {
+    message: 'Livre mis à jour',
+    response,
+  };
+}
 
   async deleteBook(id) {
     let response = await this.bookRepo.delete(id);

@@ -14,25 +14,34 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
+
+console.log("DB_HOST", process.env.DB_HOST);
+console.log("JWT", process.env.JWT_SECRET);
 @Module({
   imports: [
+
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        type: 'mysql',
+        host: config.get<string>('DB_HOST'),
+        port: config.get<number>('DB_PORT'),
+        username: config.get<string>('DB_USER'),
+        password: config.get<string>('DB_PASS'),
+        database: config.get<string>('DB_NAME'),
+        autoLoadEntities: true,
+        synchronize: true,
+      }),
+    }),
+
     TasksModule,
     BooksModule,
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: process.env.HOST,
-      port: Number(process.env.PORT),
-      username: 'root',
-      password: 'root',
-      database: 'isids26',
-      autoLoadEntities: true,
-      synchronize: true,
-    }),
     AuthModule,
-    ConfigModule.forRoot()
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

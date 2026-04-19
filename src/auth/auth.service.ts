@@ -37,31 +37,36 @@ export class AuthService {
     }
     
     async signIn(informations) {
-        // let identifiant = informations.identifiant;
-        // let password = informations.password;
-        
-        // Destructing
-        let { identifiant, password } = informations;
-        
-        let qb = await this.userRepo.createQueryBuilder('user');
-        let user = await qb.select('user')
-        .where('user.username = :ident or user.email = :ident')
-        .setParameter("ident", identifiant)
-        .getOne();
-        
-        if(!user) throw new NotFoundException("Identifiant inexistant")
-            
-        let resultMatching = await bcrypt.compare(password, user.password);
-        
-        if(resultMatching) {
-            let token = this.jwtSer.sign({id:  user.id})
-            return {
-                ...user,
-                access_token : token
-            }
-        }
-        else {
-            throw new NotFoundException("Mot de passe erroné");
-        }
-    }
+
+  const { identifiant, password } = informations;
+
+  const user = await this.userRepo
+    .createQueryBuilder('user')
+    .where('user.username = :ident', { ident: identifiant })
+    .orWhere('user.email = :ident', { ident: identifiant })
+    .getOne();
+
+  if (!user) {
+    throw new NotFoundException("Identifiant inexistant");
+  }
+
+  const match = await bcrypt.compare(password, user.password);
+
+  if (!match) {
+    throw new NotFoundException("Mot de passe erroné");
+  }
+
+  const token = this.jwtSer.sign({
+  sub: user.id,
+  email: user.email,
+  role: user.role, // IMPORTANT
+});
+  return {
+    id: user.id,
+    email: user.email,
+    username: user.username,
+    role: user.role,
+    access_token: token,
+  };
+}
 }

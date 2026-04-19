@@ -1,4 +1,4 @@
-import { Body, ConflictException, Controller, Get, Inject, Post } from '@nestjs/common';
+import { Body, ConflictException, Controller, Get, Inject, Param, Post, Put } from '@nestjs/common';
 import { AuthorService } from './author.service';
 
 @Controller('author')
@@ -29,4 +29,16 @@ export class AuthorController {
             throw new ConflictException();
         }
     }
+
+     @Put('edit/:id')
+  async modifierAuteur(
+    @Param('id') id: number,
+    @Body() body
+  ) {
+    try {
+      return await this.authService.updateAuthor(id, body);
+    } catch (err) {
+      throw new ConflictException();
+    }
+  }
 }

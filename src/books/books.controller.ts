@@ -14,9 +14,9 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { BooksService } from './books.service';
-import { JwtAuthGuard } from 'src/guards/jwt-auth/jwt-auth.guard';
+import { JwtAuthGuard } from '../guards/jwt-auth/jwt-auth.guard';
 import { request } from 'express';
-import { IsAdminGuard } from 'src/guards/is-admin/is-admin.guard';
+import { IsAdminGuard } from '../guards/is-admin/is-admin.guard';
 
 
 @Controller('books')
@@ -51,10 +51,12 @@ export class BooksController {
   }
 
   @Put('/edit/:id')
-  async modifierBook(@Body() body, @Param('id', ParseIntPipe) id) {
-    let response = await this.bookSer.updateBook(body, id);
-    return response;
-  }
+async modifierBook(
+  @Body() body,
+  @Param('id', ParseIntPipe) id: number,
+) {
+  return this.bookSer.updateBook(id, body);
+}
 
   @Delete('remove/:id')
   async removeBook(@Param('id', ParseIntPipe) id) {

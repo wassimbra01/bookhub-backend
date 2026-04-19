@@ -1,7 +1,7 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { TimeStampISIDS } from "../shared/timestamp";
 import { AuthorEntity } from "./author.entity";
-import { UserEntity } from "src/auth/entities/user.entity";
+import { UserEntity } from "../../auth/entities/user.entity";
 
 
 @Entity('livre')
@@ -34,14 +34,16 @@ export class BookEntity extends TimeStampISIDS {
     @Column()
     image : string;
     
-    @ManyToOne(type => AuthorEntity, author => author.id,   {
-               // eager : true
-            })
-    author ;
-    
-    @ManyToOne(type => UserEntity, user => user.id)
-    user;
-    
-   
-    
+    @ManyToOne(() => AuthorEntity, author => author.listeLivres, {
+  eager: true
+})
+@JoinColumn({ name: "authorId" })
+author: AuthorEntity;
+
+@Column({ nullable: true })
+authorId: number;
+
+@ManyToOne(() => UserEntity, user => user.books)
+@JoinColumn({ name: 'userId' })
+user: UserEntity;
 }

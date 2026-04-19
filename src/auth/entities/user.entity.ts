@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Roles } from '../generics/role.enum';
+import { BookEntity } from '../../books/entities/book.entity';
 
 @Entity('user')
 export class UserEntity {
@@ -29,5 +30,7 @@ export class UserEntity {
   })
   role ;
   
+  @OneToMany(() => BookEntity, book => book.user)
+books: BookEntity[];
   
 }
