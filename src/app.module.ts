@@ -13,6 +13,7 @@ import { SecondMiddleware } from './middlewares/second/second.middleware';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { RequestModule } from './requests/request.module';
 
 
 console.log("DB_HOST", process.env.DB_HOST);
@@ -41,6 +42,8 @@ console.log("JWT", process.env.JWT_SECRET);
     TasksModule,
     BooksModule,
     AuthModule,
+    RequestModule,
+
   ],
 })
 export class AppModule implements NestModule {
